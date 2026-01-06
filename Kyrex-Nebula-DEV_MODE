@@ -1,0 +1,236 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/KyrexMan/he-e9gh0heyyY31YwEy/refs/heads/main/ageegaegah2yh080gbege2b0bg0e120b8mlkpbfzweq"))()
+local Window = Library:CreateWindow({
+    Title = "🌀 " .. '<font color="#51A4E4">Nebula</font>',
+    Footer = "🌀 Nebula | Volleyball Legend | Premium 🌀",
+    Size = UDim2.fromOffset(700, 720),
+    IconSize = UDim2.fromOffset(55, 55),
+    ToggleKeybind = Enum.KeyCode.K,
+    NotifySide = "Right",
+    ShowCustomCursor = false,
+    Resizable = true,
+})
+
+Library:Notify({
+    Title = "",
+    Description = "Successfully Loaded",
+    Time = 4,
+})
+
+local Tab1 = Window:AddTab({
+    Name = "Player",
+    Icon = "user"
+})
+
+local Tab2 = Window:AddTab({
+    Name = "Physics",
+    Icon = "atom"
+})
+
+local SpeedGroupBox = Tab2:AddLeftGroupbox("Silent WalkSpeed", "chevrons-right")
+local JumpPowerGroupBox = Tab2:AddRightGroupbox("Silent JumpPower", "chevrons-up")
+
+local Tab3 = Window:AddTab({
+    Name = "Teleport",
+    Icon = "map-pin"
+})
+
+local Places = Tab3:AddLeftGroupbox("Places", "map")
+
+local Tab4 = Window:AddTab({
+    Name = "Visual",
+    Icon = "eye"
+})
+
+local Tab5 = Window:AddTab({
+    Name = "Protection",
+    Icon = "shield-check"
+})
+
+local Tab6 = Window:AddTab({
+    Name = "Misc",
+    Icon = "settings"
+})
+
+local HitboxGroupbox = Tab1:AddLeftGroupbox("Hitbox", "box")
+ 
+--===============================================================================================================
+                                            -- PLAYER HITBOX
+--===============================================================================================================
+
+local Options = Library.Options
+
+-- Add the toggle to enable/disable the effect
+local TogglePlayerHitbox = HitboxGroupbox:AddToggle("EnableHitbox", {
+    Text = "Player Hitbox",
+    Default = false, -- starts OFF
+})
+
+-- Add the slider to control size
+local SliderPlayerHitbox = HitboxGroupbox:AddSlider("PlayerHitbox", {
+    Text = "Player Hitbox Size",
+    Default = 9,
+    Min = 9,
+    Max = 50,
+    Rounding = 0,
+})
+
+-- Global variables
+getgenv().AutoShow = false  -- controlled by the toggle
+getgenv().PartSize = SliderPlayerHitbox.Value or 9
+local HitboxColor = Color3.fromRGB(81, 164, 228) -- fixed color (red)
+
+-- Update PartSize when slider changes, only if toggle is ON
+SliderPlayerHitbox:OnChanged(function(value)
+    if getgenv().AutoShow then
+        getgenv().PartSize = value
+        print("Slider changed to", value)
+    end
+end)
+
+-- Update toggle
+TogglePlayerHitbox:OnChanged(function(state)
+    getgenv().AutoShow = state
+    print("Hitbox toggle is now", state and "ON" or "OFF")
+end)
+
+-- Effect function
+local function applyEffect(part)
+    task.spawn(function()
+        while part and part.Parent do
+            if getgenv().AutoShow then
+                part.Transparency = 0.45
+                part.Shape = Enum.PartType.Ball
+                part.Size = Vector3.new(getgenv().PartSize, getgenv().PartSize, getgenv().PartSize)
+                part.Material = Enum.Material.ForceField
+                part.Color = HitboxColor -- fixed color
+            end
+            task.wait(0.1)
+        end
+    end)
+end
+
+-- Apply to existing parts
+for _, part in ipairs(workspace:GetChildren()) do
+    if part.Name == "Part" then
+        applyEffect(part)
+    end
+end
+
+-- Apply to new parts as they are added
+workspace.ChildAdded:Connect(function(child)
+    if child.Name == "Part" then
+        applyEffect(child)
+    end
+end)
+
+
+
+--===============================================================================================================
+                                                    -- BALL SIZE
+--===============================================================================================================
+
+local BallSizeGroupbox = Tab1:AddRightGroupbox("Ball Size", "volleyball")
+
+--===============================================================================================================
+                                                    -- SPEED BOOST
+--===============================================================================================================
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local humanoid
+local baseSpeed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+
+-- get humanoid safely
+local function setHumanoid(char)
+    humanoid = char:WaitForChild("Humanoid")
+    baseSpeed = humanoid.WalkSpeed
+end
+
+setHumanoid(player.Character or player.CharacterAdded:Wait())
+player.CharacterAdded:Connect(setHumanoid)
+
+local speedEnabled = false
+local speedAdd = 0
+
+-- Toggle
+local SpeedBoostToggle = SpeedGroupBox:AddToggle("SpeedBoostToggle", {
+    Text = "Speed Boost",
+    Default = true,
+})
+
+SpeedBoostToggle:OnChanged(function(state)
+    speedEnabled = state
+end)
+
+-- Slider (ADD 1 → 10)
+local WalkSpeedSlider = SpeedGroupBox:AddSlider("WalkSpeedSlider", {
+    Text = "WalkSpeed Boost (+)",
+    Default = 1,
+    Min = 1,
+    Max = 10,
+    Rounding = 0,
+})
+
+WalkSpeedSlider:OnChanged(function(value)
+    speedAdd = value
+end)
+
+-- 🔁 LOOP (this is the important part)
+RunService.Heartbeat:Connect(function()
+    if humanoid then
+        humanoid.WalkSpeed = baseSpeed + (speedEnabled and speedAdd or 0)
+    end
+end)
+--===============================================================================================================
+                                                    -- JUMP BOOST
+--===============================================================================================================
+
+Places:AddButton("Spawn (🔻)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(302.776123, 44.4574585, -1355.41772, 0.00553814275, -1.75281656e-08, 0.999984682, 5.25822408e-08, 1, 1.72372214e-08, -0.999984682, 5.24859729e-08, 0.00553814275)
+end)
+
+Places:AddButton("Shop (🛒)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(303.254608, 44.477108, -1211.59644, -0.999977529, 7.29025089e-08, 0.0067061428, 7.34762793e-08, 1, 8.53123439e-08, -0.0067061428, 8.58031726e-08, -0.999977529)
+end)
+
+Places:AddButton("AFK Server (💲)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(325.09729, 44.4319687, -1331.15967, -0.558435917, 7.58821628e-08, -0.829547644, -3.3579127e-08, 1, 1.14078986e-07, 0.829547644, 9.15612901e-08, -0.558435917)
+end)
+
+Places:AddButton("Seasonal Pass (🔑)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(284.898651, 44.4319687, -1378.15247, 0.34258008, -5.27408872e-09, 0.939488649, -1.71827419e-09, 1, 6.24034735e-09, -0.939488649, -3.75211773e-09, 0.34258008)
+end)
+
+Places:AddButton("Volleyballs Pack (🏐)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(302.834351, 44.4771156, -1287.62256, -0.998972833, -4.0332381e-08, -0.0453134254, -4.18004618e-08, 1, 3.14507957e-08, 0.0453134254, 3.33126096e-08, -0.998972833)
+end)
+
+Places:AddButton("Emote Pack (🕺)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(298.095734, 44.4771156, -1238.82568, 0.00276089134, -5.46851311e-08, 0.999996185, 4.25541158e-10, 1, 5.46841648e-08, -0.999996185, 2.74562512e-10, 0.00276089134)
+end)
+
+Places:AddButton("Score Effects Pack (🌟)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(309.910553, 44.4771156, -1238.45483, -0.00256944937, -5.68599461e-08, -0.999996722, 1.82699296e-08, 1, -5.69070799e-08, 0.999996722, -1.84160882e-08, -0.00256944937)
+end)
+
+Places:AddButton("1v1 Matchmaking (1️⃣)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(302.904816, 44.5058136, -1518.77209, 0.999964476, -9.862854e-08, -0.00842666719, 9.8676523e-08, 1, 5.27829069e-09, 0.00842666719, -6.1096177e-09, 0.999964476)
+end)
+
+Places:AddButton("2v2 Matchmaking (2️⃣)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(310.460175, 44.5304298, -1418.17236, -0.00492756255, -2.63447504e-08, -0.999987841, -6.55385151e-08, 1, -2.60221196e-08, 0.999987841, 6.54094947e-08, -0.00492756255)
+end)
+
+Places:AddButton("3v3 Matchmaking (3️⃣)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(310.512268, 44.5304298, -1458.05176, 0.00232626358, 8.74164385e-08, -0.999997318, 6.91892765e-08, 1, 8.75776323e-08, 0.999997318, -6.93928186e-08, 0.00232626358)
+end)
+
+Places:AddButton("4v4 Matchmaking (4️⃣)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(295.377991, 44.5304298, -1418.37231, -0.00912052952, -4.3306688e-08, 0.999958396, -4.9045763e-08, 1, 4.28611457e-08, -0.999958396, -4.86528045e-08, -0.00912052952)
+end)
+
+Places:AddButton("6v6 Matchmaking (6️⃣)", function()
+    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(295.423187, 44.5304298, -1458.18945, -0.00140602235, -1.47455481e-09, 0.999998987, -3.88626997e-09, 1, 1.46909207e-09, -0.999998987, -3.88420052e-09, -0.00140602235)
+end)
